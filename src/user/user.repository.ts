@@ -40,7 +40,7 @@ export class UserRepository {
       user.email = req.email;
       user.password = req.password;
     }
-    return 'This action updates a user';
+    return this.userList.find((user) => user.username === username);
   }
   
   remove(username: string) {
@@ -48,6 +48,6 @@ export class UserRepository {
     if (user) {
       this.userList.splice(this.userList.indexOf(user), 1);
     }
-    return 'This action removes a user';
+    return this.userList.find((user) => user.username === username);
   }
 }

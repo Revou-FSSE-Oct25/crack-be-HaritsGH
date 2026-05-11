@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBracketScoreDto } from './dto/create-bracket-score.dto';
 import { UpdateBracketScoreDto } from './dto/update-bracket-score.dto';
+import { BracketScoreRepository, BracketScore } from './bracket-score.repository';
 
 @Injectable()
 export class BracketScoreService {
-  create(createBracketScoreDto: CreateBracketScoreDto) {
-    return 'This action adds a new bracketScore';
+  constructor(private readonly bracketScoreRepository: BracketScoreRepository) {}
+
+  create(createBracketScoreDto: CreateBracketScoreDto): BracketScore {
+    return this.bracketScoreRepository.create(createBracketScoreDto);
   }
 
-  findAll() {
-    return `This action returns all bracketScore`;
+  findByTournamentId(tournamentId: number): BracketScore[] {
+    return this.bracketScoreRepository.findByTournamentId(tournamentId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bracketScore`;
-  }
-
-  update(id: number, updateBracketScoreDto: UpdateBracketScoreDto) {
-    return `This action updates a #${id} bracketScore`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} bracketScore`;
+  updateByTournamentAndRound(tournamentId: number, roundId: number, updateBracketScoreDto: UpdateBracketScoreDto) {
+    const updatedScore = this.bracketScoreRepository.updateByTournamentAndRound(
+      tournamentId, 
+      roundId, 
+      updateBracketScoreDto
+    );
+    
+    if (!updatedScore) {
+      return { message: 'Bracket score not found for the specified tournament and round' };
+    }
+    
+    return updatedScore;
   }
 }
+
+export type { BracketScore };

@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 
-@Controller('participant')
+@Controller('participants')
 export class ParticipantController {
   constructor(private readonly participantService: ParticipantService) {}
 
   @Post()
-  create(@Body() createParticipantDto: CreateParticipantDto) {
-    return this.participantService.create(createParticipantDto);
+  addParticipant(@Body() req: CreateParticipantDto) {
+    return this.participantService.addParticipant(req);
   }
 
-  @Get()
-  findAll() {
-    return this.participantService.findAll();
+  @Get(':tourid')
+  findTournament(@Param('tourid') tourid: number) {
+    return this.participantService.findTournament(tourid);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.participantService.findOne(+id);
+  @Get('user/:userid')
+  findUser(@Param('userid') userid: string) {
+    return this.participantService.findUser(userid);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateParticipantDto: UpdateParticipantDto) {
-    return this.participantService.update(+id, updateParticipantDto);
+  @Patch(':tourid')
+  updateParticipation(@Param('tourid') tourid: number, @Query('username') username: string, @Body() req: UpdateParticipantDto) {
+    return this.participantService.updateParticipation(tourid, username, req);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.participantService.remove(+id);
+  @Delete(':tourid')
+  cancelParticipation(@Param('tourid') tourid: number, @Query('username') username: string) {
+    return this.participantService.removeParticipation(tourid, username);
   }
 }

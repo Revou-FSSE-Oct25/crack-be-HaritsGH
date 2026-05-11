@@ -6,13 +6,13 @@ import { TournamentRepository } from './tournament.repository';
 @Injectable()
 export class TournamentService {
   constructor(private readonly tournamentRepository: TournamentRepository) {}
-  create(createTournamentDto: CreateTournamentDto) {
+  create(req: CreateTournamentDto) {
 
-    return this.tournamentRepository.create();
+    return this.tournamentRepository.create(req);
   }
 
-  findAll() {
-    return this.tournamentRepository.findAll();
+  findAll(pagination: number = 1) {
+    return this.tournamentRepository.findAll(pagination);
   }
 
   findOne(id: number) {

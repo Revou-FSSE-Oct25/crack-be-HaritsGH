@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -22,6 +22,18 @@ export class UserController {
     return {
       message: 'Users retrieved successfully',
       data: this.userService.findAll(page),
+    };
+  }
+
+  @Get('profile')
+  getProfile(@Request() req) {
+    // For fetching current user's profile using JWT
+    return {
+      message: 'User profile retrieved successfully',
+      data: {
+        id: req.user.sub,
+        username: req.user.username
+      }
     };
   }
 

@@ -8,7 +8,12 @@ import { ParticipantModule } from './participant/participant.module';
 import { BracketScoreModule } from './bracket-score/bracket-score.module';
 
 @Module({
-  imports: [AuthModule, UserModule, TournamentModule, ParticipantModule, BracketScoreModule],
+  imports: [AuthModule,
+    UserModule, 
+    TournamentModule, 
+    ParticipantModule, 
+    BracketScoreModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

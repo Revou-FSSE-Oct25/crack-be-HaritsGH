@@ -13,9 +13,10 @@
      - Password {String}
      - Email {String}
      - ProfileImageURL {String}
-     - Created-At {Datetime} Optional?
+     - AccessToken {String?}
+     - RefreshToken {String?}
   
-2. Tournament
+1. Tournament
   Table for storing details of information about tournament events.
   
     Columns:
@@ -24,7 +25,9 @@
      - Date {Date}
      - Game {String}
      - Status {String}
-3. Participant
+     - Admins (FK) {Int[]}
+     - Participants {Int[]}
+1. Participant
   Table for storing participant details for each tournament.
   
     Columns:
@@ -32,7 +35,7 @@
      - UserID (FK) {String}   
      - Alias {String}
      - Prefix {String}
-4. BracketScore
+1. BracketScore
   Table for storing participant's scores for each tournament.
   
     Columns:
