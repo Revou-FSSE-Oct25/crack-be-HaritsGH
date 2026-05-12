@@ -34,12 +34,12 @@ export class BracketScoreRepository {
     });
   }
 
-  async updateScore(tournamentId: number, roundId: number, updateBracketScoreDto: BracketScoreDto) {
+  async updateScore(tournamentId: number, updateBracketScoreDto: BracketScoreDto) {
     return this.prisma.bracketScore.update({
       where: {
         tournamentId_roundId: {
           tournamentId,
-          roundId,
+          roundId: updateBracketScoreDto.roundId,
         },
       },
       data: updateBracketScoreDto,

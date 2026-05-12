@@ -15,7 +15,6 @@ export class BracketScoreService {
   }
 
   async updateScore(tournamentId: number, updateBracketScoreDto: BracketScoreDto) {
-    const roundId = updateBracketScoreDto.roundId ?? 1;
-    return await this.bracketScoreRepository.updateScore(tournamentId, roundId, updateBracketScoreDto);
+    return await this.bracketScoreRepository.updateScore(tournamentId, updateBracketScoreDto);
   }
 }
