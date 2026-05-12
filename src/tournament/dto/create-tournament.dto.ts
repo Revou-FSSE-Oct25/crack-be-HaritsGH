@@ -1,6 +1,6 @@
 export class CreateTournamentDto {
   name: string;
   game: string;
-  date: Date;
-  admins: string[];
+  startDate: Date;
+  endDate?: Date; // Optional - will be set in service
 }

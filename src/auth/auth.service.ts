@@ -15,16 +15,28 @@ export class AuthService {
   ) {}
 
   async register(req : CreateAuthDto) {
-    const userExists = await this.authRepository.checkUserExists(req.username, req.email);
-    if (userExists) {
-      throw new ConflictException('User already exists');
+    // Reject usernames containing 'deleted' to prevent conflicts with anonymized accounts
+    if (req.username.includes('deleted')) {
+      throw new ConflictException('Username cannot contain specific keywords');
+    }
+
+    // Check username uniqueness
+    const existingUsername = await this.authRepository.findByUsername(req.username);
+    if (existingUsername) {
+      throw new ConflictException('Username already exists');
+    }
+
+    // Check email uniqueness
+    const existingEmail = await this.authRepository.findByEmail(req.email);
+    if (existingEmail) {
+      throw new ConflictException('Email already exists');
     }
     
     const hashedPassword = await bcrypt.hash(req.password, parseInt(process.env.BCRYPT_SALT_ROUNDS as string))
     
     const newUser = await this.authRepository.register({...req, password: hashedPassword})
 
-    const payload = { sub: newUser.id, username: newUser.username, email: newUser.email }
+    const payload = { username: newUser.username, userId: newUser.id }
     
     const accessToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
@@ -35,6 +47,11 @@ export class AuthService {
   }
 
   async login(credentials: AccessAuthDto) {
+    // Reject usernames containing 'deleted' to prevent login attempts on anonymized accounts
+    if (credentials.username.includes('deleted')) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     const user = await this.authRepository.login(credentials.username)
 
     if (!user) {
@@ -46,7 +63,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials')
     }
 
-    const payload = { username: user.username }
+    const payload = { username: user.username, userId: user.id }
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });

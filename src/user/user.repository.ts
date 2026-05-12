@@ -1,53 +1,69 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-
-type User = {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-}
+import { PrismaService } from "../prisma.service";
 
 @Injectable()
 export class UserRepository {
-  private userList: User[] = [];
+  constructor(private prisma: PrismaService) {}
+
   
-  create(req: CreateUserDto) {
-    const user: User = {
-      id: this.userList.length === 0 ? 1 : this.userList[-1].id + 1,
-      username: req.username,
-      email: req.email,
-      password: req.password,
-    };
-    this.userList.push(user);
-    return user;
+  async getProfile(username: string) {
+    return await this.prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        profileImageURL: true,
+      },
+    });
+  }
+  
+  async updateProfile(username: string, req: any) {
+    return await this.prisma.user.update({
+      where: { username },
+      data: {
+        email: req.email,
+        profileImageURL: req.profileImageURL,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        profileImageURL: true,
+      },
+    });
+  }
+  
+  async changePassword(username: string, hashedPassword: string) {
+    return await this.prisma.user.update({
+      where: { username },
+      data: {
+        password: hashedPassword,
+      },
+      select: {
+        username: true,
+      },
+    });
   }
 
-  findAll(pagination: number = 1) {
-    const limit = 10;
-    const startIndex = (pagination - 1) * limit;
-    const endIndex = startIndex + limit;
-    return this.userList.slice(startIndex, endIndex);
-  }
-  
-  findOne(username: string) {
-    return this.userList.find((user) => user.username === username);
-  }
-  
-  update(username: string, req: any) {
-    const user = this.userList.find((user) => user.username === username);
-    if (user) {
-      user.email = req.email;
-      user.password = req.password;
-    }
-    return this.userList.find((user) => user.username === username);
-  }
-  
-  remove(username: string) {
-    const user = this.userList.find((user) => user.username === username);
-    if (user) {
-      this.userList.splice(this.userList.indexOf(user), 1);
-    }
-    return this.userList.find((user) => user.username === username);
+  async deleteAccount(username: string, anonUsername: string, anonEmail: string, anonHashedPassword: string) {
+    return await this.prisma.user.update({
+      where: { username },
+      data: {
+        username: anonUsername,
+        email: anonEmail,
+        password: anonHashedPassword, // Set hashed password for deleted user
+        profileImageURL: null, // Remove profile image
+        accessToken: null, // Clear tokens
+        refreshToken: null, // Clear tokens
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        profileImageURL: true,
+        createdAt: true,
+      },
+    });
   }
 }

@@ -1,7 +1,7 @@
 export class CreateBracketScoreDto {
   tournamentId: number;
   roundId: number;
-  usersId: string[];
-  score: number[];
-  winnerId: string;
+  userIds: number[];
+  scores: number[];
+  winnerId: number;
 }

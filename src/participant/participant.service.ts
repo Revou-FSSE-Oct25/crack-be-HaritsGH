@@ -7,23 +7,23 @@ import { ParticipantRepository } from './participant.repository';
 export class ParticipantService {
   constructor (private readonly participantRepository: ParticipantRepository) {}
 
-  addParticipant(req: CreateParticipantDto) {
-    return this.participantRepository.addParticipant(req);
+  addParticipant(createParticipantDto: CreateParticipantDto, userId: number) {
+    return this.participantRepository.addParticipant(createParticipantDto, userId);
   }
 
   findTournament(tourid: number) {
     return this.participantRepository.findTournament(tourid);
   }
 
-  findUser(userid: string) {
+  findUser(userid: number) {
     return this.participantRepository.findUser(userid);
   }
 
-  updateParticipation(tourid: number, username: string, req: UpdateParticipantDto) {
-    return this.participantRepository.updateParticipation(tourid, username, req);
+  updateParticipation(tourid: number, userid: number, updateParticipantDto: UpdateParticipantDto) {
+    return this.participantRepository.updateParticipation(tourid, userid, updateParticipantDto);
   }
 
-  removeParticipation(tourid: number, username: string) {
-    return this.participantRepository.removeParticipation(tourid, username);
+  removeParticipation(tourid: number, userid: number) {
+    return this.participantRepository.removeParticipation(tourid, userid);
   }
 }

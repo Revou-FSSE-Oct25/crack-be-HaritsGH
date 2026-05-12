@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -6,15 +7,26 @@ import { UserModule } from './user/user.module';
 import { TournamentModule } from './tournament/tournament.module';
 import { ParticipantModule } from './participant/participant.module';
 import { BracketScoreModule } from './bracket-score/bracket-score.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
-  imports: [AuthModule,
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    AuthModule,
     UserModule, 
     TournamentModule, 
     ParticipantModule, 
     BracketScoreModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

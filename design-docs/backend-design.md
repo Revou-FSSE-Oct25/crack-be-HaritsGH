@@ -16,18 +16,19 @@
      - AccessToken {String?}
      - RefreshToken {String?}
   
-1. Tournament
+2. Tournament
   Table for storing details of information about tournament events.
   
     Columns:
      - ID (PK) {Int}
      - Name {String}
-     - Date {Date}
+     - StartDate {Date}
+     - EndDate {Date}
      - Game {String}
      - Status {String}
      - Admins (FK) {Int[]}
-     - Participants {Int[]}
-1. Participant
+     - Participants (FK) {Int[]}
+3. Participant
   Table for storing participant details for each tournament.
   
     Columns:
@@ -35,15 +36,15 @@
      - UserID (FK) {String}   
      - Alias {String}
      - Prefix {String}
-1. BracketScore
+4. BracketScore
   Table for storing participant's scores for each tournament.
   
     Columns:
      - TournamentID (FK) {Int}
      - RoundID {Int}
-     - UsersID (FK) {String[]}
+     - UsersID (FK) {Int[]}
      - Score {Int[]}
-     - WinnerID {String}
+     - WinnerID (FK) {Int}
 
 ## Endpoint
 

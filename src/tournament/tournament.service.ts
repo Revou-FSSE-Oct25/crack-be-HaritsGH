@@ -6,24 +6,49 @@ import { TournamentRepository } from './tournament.repository';
 @Injectable()
 export class TournamentService {
   constructor(private readonly tournamentRepository: TournamentRepository) {}
-  create(req: CreateTournamentDto) {
-
-    return this.tournamentRepository.create(req);
+  
+  createTourney(createTournamentDto: CreateTournamentDto, creatorUserId: number) {
+    const tournamentData = {
+      ...createTournamentDto,
+      admins: [creatorUserId],
+      participants: [],
+    };
+    return this.tournamentRepository.createTourney(tournamentData);
   }
 
-  findAll(pagination: number = 1) {
-    return this.tournamentRepository.findAll(pagination);
+  findAllTourney(pagination: number = 1) {
+    return this.tournamentRepository.findAllTourney(pagination);
   }
 
-  findOne(id: number) {
-    return this.tournamentRepository.findOne(id);
+  findOneTourney(tourid: number) {
+    return this.tournamentRepository.findOneTourney(tourid);
   }
 
-  update(id: number, updateTournamentDto: UpdateTournamentDto) {
-    return this.tournamentRepository.update(id, updateTournamentDto);
+  async updateTourney(tourid: number, updateTournamentDto: UpdateTournamentDto) {
+    if (updateTournamentDto.admins) {
+      const existingTournament = await this.tournamentRepository.getTourneyAdmins(tourid);
+      const existingAdmins = existingTournament?.admins || [];
+      const mergedAdmins = [...new Set([...existingAdmins, ...updateTournamentDto.admins])];
+      updateTournamentDto.admins = mergedAdmins;
+    }
+    if (updateTournamentDto.participants) {
+      const existingTournament = await this.tournamentRepository.getTourneyParticipants(tourid);
+      const existingParticipants = existingTournament?.participants || [];
+      const mergedParticipants = [...new Set([...existingParticipants, ...updateTournamentDto.participants])];
+      updateTournamentDto.participants = mergedParticipants;
+    }
+    return this.tournamentRepository.updateTourney(tourid, updateTournamentDto);
   }
 
-  remove(id: number) {
-    return this.tournamentRepository.remove(id);
+  deleteTourney(tourid: number) {
+    return this.tournamentRepository.deleteTourney(tourid);
+  }
+
+  getTourneyAdmins(tourid: number) {
+    return this.tournamentRepository.getTourneyAdmins(tourid);
+  }
+
+  getTourneyParticipants(tourid: number) {
+    return this.tournamentRepository.getTourneyParticipants(tourid);
   }
 }

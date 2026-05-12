@@ -1,6 +1,6 @@
 export class CreateParticipantDto {
   tournamentId: number;
-  userId: string;
+  userId: number;
   alias: string;
   prefix: string;
 }

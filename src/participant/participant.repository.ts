@@ -1,56 +1,66 @@
 import { Injectable } from "@nestjs/common";
 import { CreateParticipantDto } from "./dto/create-participant.dto";
 import { UpdateParticipantDto } from "./dto/update-participant.dto";
-
-type Participant = {
-  tournamentId: number;
-  userId: string;
-  alias: string;
-  prefix: string;
-}
+import { PrismaService } from "../prisma.service";
 
 @Injectable()
 export class ParticipantRepository {
-  private participantList: Participant[] = [];
+  constructor(private readonly prisma: PrismaService) {}
 
-  addParticipant(req: CreateParticipantDto) {
-    const participant: Participant = {
-      tournamentId: req.tournamentId,
-      userId: req.userId,
-      alias: req.alias,
-      prefix: req.prefix
-    };
-    this.participantList.push(participant);
-    return participant;
+  addParticipant(createParticipantDto: CreateParticipantDto, userId: number) {
+    return this.prisma.participant.create({
+      data: {
+        tournamentId: createParticipantDto.tournamentId,
+        userId: userId,
+        alias: createParticipantDto.alias,
+        prefix: createParticipantDto.prefix
+      }
+    });
   }
 
   findTournament(tournamentId: number) {
-    return this.participantList.filter(p => p.tournamentId === tournamentId);
+    return this.prisma.participant.findMany({
+      where: { tournamentId }
+    });
   }
 
-  findUser(userId: string) {
-    return this.participantList.filter(p => p.userId === userId);
+  findUser(userId: number) {
+    return this.prisma.participant.findMany({
+      where: { userId }
+    });
   }
 
-  findByTournamentAndUser(tournamentId: number, userId: string) {
-    return this.participantList.find(p => p.tournamentId === tournamentId && p.userId === userId);
+  findByTournamentAndUser(tournamentId: number, userId: number) {
+    return this.prisma.participant.findUnique({
+      where: {
+        tournamentId_userId: {
+          tournamentId,
+          userId
+        }
+      }
+    });
   }
 
-  updateParticipation(tournamentId: number, userId: string, req: UpdateParticipantDto) {
-    const participant = this.findByTournamentAndUser(tournamentId, userId);
-    if (participant) {
-      if (req.alias) participant.alias = req.alias;
-      if (req.prefix) participant.prefix = req.prefix;
-    }
-    return this.findByTournamentAndUser(tournamentId, userId);
+  updateParticipation(tournamentId: number, userId: number, req: UpdateParticipantDto) {
+    return this.prisma.participant.update({
+      where: {
+        tournamentId_userId: {
+          tournamentId,
+          userId
+        }
+      },
+      data: req
+    });
   }
 
-  removeParticipation(tournamentId: number, userId: string) {
-    const participant = this.findByTournamentAndUser(tournamentId, userId);
-    if (participant) {
-      const index = this.participantList.indexOf(participant);
-      this.participantList.splice(index, 1);
-    }
-    return participant;
+  removeParticipation(tournamentId: number, userId: number) {
+    return this.prisma.participant.delete({
+      where: {
+        tournamentId_userId: {
+          tournamentId,
+          userId
+        }
+      }
+    });
   }
 }

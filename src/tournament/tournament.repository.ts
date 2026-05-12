@@ -1,72 +1,69 @@
 import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma.service";
 import { CreateTournamentDto } from "./dto/create-tournament.dto";
 import { UpdateTournamentDto } from "./dto/update-tournament.dto";
 
-type Tournament = {
-  id: number;
-  name: string;
-  game: string;
-  date: Date;
-  admins: string[];
-  participants: string[];
-  rounds: TournamentRound[];
-}
-
-export type TournamentRound = {
-  id: number;
-  playerA: string;
-  playerB: string;
-  scoreA: number;
-  scoreB: number;
-  winner: number;
-}
-
 @Injectable()
 export class TournamentRepository{
-  private tourList: Tournament[] = []
+  constructor(private prisma: PrismaService) {}
   
-  create(req: CreateTournamentDto) {
-    this.tourList.push({
-      id: this.tourList.length + 1,
-      name: req.name,
-      game: req.game,
-      date: req.date,
-      admins: req.admins,
-      participants: [],
-      rounds: []
-    })
-    return this.tourList[this.tourList.length - 1]
+  async createTourney(createTournamentDto: CreateTournamentDto) {
+    return this.prisma.tournament.create({
+      data: {
+        ...createTournamentDto,
+        status: 'Upcoming',
+        endDate: createTournamentDto.endDate || new Date(createTournamentDto.startDate.getTime() + 24 * 60 * 60 * 1000),
+      }
+    });
   }
 
-  findAll(pagination: number) {
+  async findAllTourney(pagination: number) {
     const limit = 20;
-    const startIndex = (pagination - 1) * limit;
-    const endIndex = startIndex + limit;
-    return this.tourList.slice(startIndex, endIndex)
+    const skip = (pagination - 1) * limit;
+    return this.prisma.tournament.findMany({
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        game: true,
+        startDate: true,
+        status: true
+        // Not including admins and participants for browsing page
+      }
+    });
   }
 
-  findOne(id: number) {
-    return this.tourList.find((turni) => turni.id === id)
+  async findOneTourney(tourid: number) {
+    return this.prisma.tournament.findUnique({
+      where: { id: tourid },
+    });
   }
 
-  update(id: number, req: UpdateTournamentDto) {
-    const turni = this.tourList.find((turni) => turni.id === id)
-    if (turni) {
-      turni.name = req.name;
-      turni.game = req.game;
-      turni.date = req.date;
-      turni.admins = req.admins;
-      turni.participants = req.participants;
-      turni.rounds = req.rounds
-    }
-    return this.tourList.find((turni) => turni.id === id);
+  async updateTourney(tourid: number, updateTournamentDto: UpdateTournamentDto) {
+    return this.prisma.tournament.update({
+      where: { id: tourid },
+      data: updateTournamentDto
+    });
   }
 
-  remove(id: number) {
-    const turni = this.tourList.find((turni) => turni.id === id)
-    if (turni) {
-      this.tourList.splice(this.tourList.indexOf(turni, 1))
-    }
-    return this.tourList.find((turni) => turni.id === id);
+  async deleteTourney(tourid: number) {
+    return this.prisma.tournament.delete({
+      where: { id: tourid }
+    });
+  }
+
+  async getTourneyAdmins(tourid: number) {
+    return this.prisma.tournament.findUnique({
+      where: { id: tourid },
+      select: { admins: true }
+    });
+  }
+
+  async getTourneyParticipants(tourid: number) {
+    return this.prisma.tournament.findUnique({
+      where: { id: tourid },
+      select: { participants: true }
+    });
   }
 }

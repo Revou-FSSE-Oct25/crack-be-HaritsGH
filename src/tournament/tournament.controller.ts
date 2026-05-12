@@ -1,63 +1,74 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request } from '@nestjs/common';
 import { TournamentService } from './tournament.service';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
+import { request } from 'http';
 
 @Controller('tournament')
 export class TournamentController {
   constructor(private readonly tournamentService: TournamentService) {}
 
   @Post()
-  create(@Body() req: CreateTournamentDto) {
+  createTourney(@Body() createTournamentDto: CreateTournamentDto, @Request() req: any) {
+    // For creating a tournament
+    // Automatically add the current user as an admin
     return {
-      message: 'New user created',
-      data: this.tournamentService.create(req) 
+      message: 'New tournament created',
+      data: this.tournamentService.createTourney(createTournamentDto, req.user.id) 
     };
   }
 
   @Get()
-  findAll(@Param() pagination?: number) {
+  findAllTourney(@Query('page') page?: number) {
+    // For fetching all tournaments with pagination at browsing page
+    // Not including properties like admins and participants
+    const pagination = page || 1;
     return {
-      message: `Fetched page ${pagination? pagination : 1} of tounament list`,
-      data: this.tournamentService.findAll(pagination)
+      message: `Fetched page ${pagination} of tounament list`,
+      data: this.tournamentService.findAllTourney(pagination)
     };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
+  @Get(':tourid')
+  findOneTourney(@Param('tourid') tourid: number) {
+    // For fetching a specific tournament by ID
     return {
-      message: `Fetched tounament with id ${id}`,
-      data: this.tournamentService.findOne(id)};
+      message: `Fetched tounament with id ${tourid}`,
+      data: this.tournamentService.findOneTourney(tourid)};
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() req: UpdateTournamentDto) {
+  @Patch(':tourid')
+  updateTourney(@Param('tourid') tourid: number, @Body() req: UpdateTournamentDto) {
+    // For updating a specific tournament by ID
     return {
-      message: `Updated tounament with id ${id}`,
-      data: this.tournamentService.update(id, req)};
+      message: `Updated tounament with id ${tourid}`,
+      data: this.tournamentService.updateTourney(tourid, req)};
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
+  @Delete(':tourid')
+  deleteTourney(@Param('tourid') tourid: number) {
+    // For deleting a specific tournament by ID
     return {
-      message: `Deleted tounament with id ${id}`,
-      data: this.tournamentService.remove(id)
+      message: `Deleted tounament with id ${tourid}`,
+      data: this.tournamentService.deleteTourney(tourid)
     };
   }
 
-  @Get(':id/admins')
-  getTourneyAdmins(@Param('id') id: number) {
+  @Get(':tourid/admins')
+  getTourneyAdmins(@Param('tourid') tourid: number) {
+    // For fetching admins of a specific tournament by ID used for granting permissions
     return {
-      message: `Fetched tourney admins for tournament with id ${id}`,
-      data: this.tournamentService.getTourneyAdmins(id)
+      message: `Fetched tourney admins for tournament with id ${tourid}`,
+      data: this.tournamentService.getTourneyAdmins(tourid)
     };
   }
 
-  @Get(':id/participants')
-  getTourneyParticipants(@Param('id') id: number) {
+  @Get(':tourid/participants')
+  getTourneyParticipants(@Param('tourid') tourid: number) {
+    // For fetching participants of a specific tournament by ID
     return {
-      message: `Fetched participants for tournament with id ${id}`,
-      data: this.tournamentService.getTourneyParticipants(id)
+      message: `Fetched participants for tournament with id ${tourid}`,
+      data: this.tournamentService.getTourneyParticipants(tourid)
     };
   }
 }

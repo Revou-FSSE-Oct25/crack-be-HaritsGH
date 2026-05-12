@@ -2,12 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nes
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AccessAuthDto } from './dto/access-auth.dto';
+import { Public } from './decorators/public.decorator';
 import { access } from 'fs';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('register')
   async register(@Body() req: CreateAuthDto) {
     const res = await this.authService.register(req)
@@ -19,6 +21,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post('login')
   async login(@Body() credentials: AccessAuthDto) {
     const res = await this.authService.login(credentials);
@@ -31,14 +34,9 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Request() req) {
-    await this.authService.logout(req.user.sub);
+    await this.authService.logout(req.user.username);
     return {
       message: 'User logged out successfully'
     };
-  }
-
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Controller('participants')
+@UseGuards(JwtAuthGuard)
 export class ParticipantController {
   constructor(private readonly participantService: ParticipantService) {}
 
   @Post()
-  addParticipant(@Body() req: CreateParticipantDto) {
-    return this.participantService.addParticipant(req);
+  addParticipant(@Body() createParticipantDto: CreateParticipantDto, @Request() req: any) {
+    return this.participantService.addParticipant(createParticipantDto, req.user.userId);
   }
 
-  @Get(':tourid')
+  @Get('tournament/:tourid')
   findTournament(@Param('tourid') tourid: number) {
     return this.participantService.findTournament(tourid);
   }
 
   @Get('user/:userid')
-  findUser(@Param('userid') userid: string) {
+  findUser(@Param('userid') userid: number) {
     return this.participantService.findUser(userid);
   }
 
-  @Patch(':tourid')
-  updateParticipation(@Param('tourid') tourid: number, @Query('username') username: string, @Body() req: UpdateParticipantDto) {
-    return this.participantService.updateParticipation(tourid, username, req);
+  @Patch()
+  updateParticipation(@Query('tourid') tourid: number, @Body() updateParticipantDto: UpdateParticipantDto, @Request() req: any) {
+    // Only allowed if the tournament has not started yet
+    return this.participantService.updateParticipation(tourid, req.user.userId, updateParticipantDto);
   }
 
-  @Delete(':tourid')
-  cancelParticipation(@Param('tourid') tourid: number, @Query('username') username: string) {
-    return this.participantService.removeParticipation(tourid, username);
+  @Delete()
+  cancelParticipation(@Query('tourid') tourid: number, @Request() req: any) {
+    // Only allowed if the tournament has not started yet
+    return this.participantService.removeParticipation(tourid, req.user.userId);
   }
 }
