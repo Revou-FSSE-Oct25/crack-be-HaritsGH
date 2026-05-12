@@ -38,8 +38,8 @@ export class AuthService {
 
     const payload = { username: newUser.username, userId: newUser.id }
     
-    const accessToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
+    const accessToken = this.jwtService.sign({ ...payload, type: 'access' }, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
+    const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
 
     await this.authRepository.storeTokens(newUser.username, accessToken, refreshToken)
 
@@ -65,8 +65,8 @@ export class AuthService {
 
     const payload = { username: user.username, userId: user.id }
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
+    const accessToken = this.jwtService.sign({ ...payload, type: 'access' }, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
+    const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
 
     await this.authRepository.storeTokens(user.username, accessToken, refreshToken)
 
@@ -75,6 +75,35 @@ export class AuthService {
     };
   }
   
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
+      const user = await this.authRepository.findByUsername(payload.username);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const newPayload = { username: user.username, userId: user.id };
+      
+      const newAccessToken = this.jwtService.sign({ ...newPayload, type: 'access' }, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
+      const newRefreshToken = this.jwtService.sign({ ...newPayload, type: 'refresh' }, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
+
+      await this.authRepository.storeTokens(user.username, newAccessToken, newRefreshToken);
+
+      return {
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
   async logout(username: string) {
     await this.authRepository.clearTokens(username);
   }

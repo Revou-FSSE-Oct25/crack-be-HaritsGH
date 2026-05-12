@@ -19,6 +19,7 @@ model User {
   // Relations
   participations Participant[]
   bracketScoreWins BracketScore[] @relation("BracketScoreWinner")
+  ownedTournaments Tournament[] @relation("TournamentOwner")
 }
 
 model Tournament {
@@ -28,19 +29,20 @@ model Tournament {
   endDate      DateTime
   game         String
   status       String
+  owner        Int // User id
   admins       Int[] // User id
-  participants Int[] // User id
   
   // Relations
   participantRecords Participant[]
   bracketScores BracketScore[]
+  ownerUser User @relation("TournamentOwner", fields: [owner], references: [id])
 }
 
 model Participant {
   tournamentId Int
   userId       Int
   alias        String
-  prefix       String
+  prefix       String?
 
   // Relations
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)

@@ -1,16 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
 import { BracketScoreService } from './bracket-score.service';
-import { CreateBracketScoreDto } from './dto/create-bracket-score.dto';
-import { UpdateBracketScoreDto } from './dto/update-bracket-score.dto';
+import { BracketScoreDto } from './dto/bracket-score.dto';
 
 @Controller('bracket-scores')
 export class BracketScoreController {
   constructor(private readonly bracketScoreService: BracketScoreService) {}
 
-  @Post()
-  async createScore(@Body() createBracketScoreDto: CreateBracketScoreDto) {
+  @Post(':tourid')
+  async createScore(@Param('tourid') tourid: number, @Body() createBracketScoreDto: BracketScoreDto) {
     // Called when a score for a match is submitted
-    return this.bracketScoreService.createScore(createBracketScoreDto);
+    return this.bracketScoreService.createScore(tourid, createBracketScoreDto);
   }
 
   @Get(':tourid')
@@ -19,13 +18,11 @@ export class BracketScoreController {
     return this.bracketScoreService.findByTournamentId(tourid);
   }
 
-  @Patch(':tourid/:roundid')
+  @Patch(':tourid')
   async updateScore(
-    @Param('tourid') tourid: number,
-    @Param('roundid') roundid: number,
-    @Body() updateBracketScoreDto: UpdateBracketScoreDto,
+    @Param('tourid') tourid: number, @Body() updateBracketScoreDto: BracketScoreDto,
   ) {
     // Called when revising the score for a match
-    return this.bracketScoreService.updateScore(tourid, roundid, updateBracketScoreDto);
+    return this.bracketScoreService.updateScore(tourid, updateBracketScoreDto);
   }
 }

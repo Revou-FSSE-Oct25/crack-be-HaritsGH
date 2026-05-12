@@ -1,15 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { CreateBracketScoreDto } from "./dto/create-bracket-score.dto";
-import { UpdateBracketScoreDto } from "./dto/update-bracket-score.dto";
+import { BracketScoreDto } from "./dto/bracket-score.dto";
 
 @Injectable()
 export class BracketScoreRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createScore(createBracketScoreDto: CreateBracketScoreDto) {
+  async createScore(tournamentId: number, createBracketScoreDto: BracketScoreDto) {
     return this.prisma.bracketScore.create({
-      data: createBracketScoreDto,
+      data: {
+        ...createBracketScoreDto,
+        tournamentId,
+      },
     });
   }
 
@@ -32,7 +34,7 @@ export class BracketScoreRepository {
     });
   }
 
-  async updateScore(tournamentId: number, roundId: number, updateBracketScoreDto: UpdateBracketScoreDto) {
+  async updateScore(tournamentId: number, roundId: number, updateBracketScoreDto: BracketScoreDto) {
     return this.prisma.bracketScore.update({
       where: {
         tournamentId_roundId: {

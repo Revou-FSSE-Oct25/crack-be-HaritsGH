@@ -1,5 +1,4 @@
-export class CreateBracketScoreDto {
-  tournamentId: number;
+export class BracketScoreDto {
   roundId: number;
   userIds: number[];
   scores: number[];

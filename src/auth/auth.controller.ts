@@ -32,6 +32,17 @@ export class AuthController {
     };
   }
 
+  @Public()
+  @Post('refresh')
+  async refreshToken(@Body() body: { refresh_token: string }) {
+    const result = await this.authService.refreshToken(body.refresh_token);
+    return {
+      message: 'Token refreshed successfully',
+      access_token: result.access_token,
+      refresh_token: result.refresh_token
+    };
+  }
+
   @Post('logout')
   async logout(@Request() req) {
     await this.authService.logout(req.user.username);

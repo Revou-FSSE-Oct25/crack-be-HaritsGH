@@ -4,5 +4,4 @@ import { CreateTournamentDto } from './create-tournament.dto';
 export class UpdateTournamentDto extends PartialType(CreateTournamentDto) {
   status?: string;
   admins?: number[];
-  participants?: number[];
 }

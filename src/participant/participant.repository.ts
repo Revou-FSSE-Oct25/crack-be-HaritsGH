@@ -7,41 +7,30 @@ import { PrismaService } from "../prisma.service";
 export class ParticipantRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  addParticipant(createParticipantDto: CreateParticipantDto, userId: number) {
+  participate(tourid: number, createParticipantDto: CreateParticipantDto, userId: number) {
     return this.prisma.participant.create({
       data: {
-        tournamentId: createParticipantDto.tournamentId,
+        tournamentId: tourid,
         userId: userId,
         alias: createParticipantDto.alias,
-        prefix: createParticipantDto.prefix
+        prefix: createParticipantDto.prefix || null
       }
     });
   }
 
-  findTournament(tournamentId: number) {
-    return this.prisma.participant.findMany({
-      where: { tournamentId }
-    });
-  }
-
-  findUser(userId: number) {
+  getParticipatedTournament(userId: number) {
     return this.prisma.participant.findMany({
       where: { userId }
     });
   }
 
-  findByTournamentAndUser(tournamentId: number, userId: number) {
-    return this.prisma.participant.findUnique({
-      where: {
-        tournamentId_userId: {
-          tournamentId,
-          userId
-        }
-      }
+  getTournamentParticipant(tournamentId: number) {
+    return this.prisma.participant.findMany({
+      where: { tournamentId }
     });
   }
 
-  updateParticipation(tournamentId: number, userId: number, req: UpdateParticipantDto) {
+  updateParticipation(tournamentId: number, userId: number, updateParticipantDto: UpdateParticipantDto) {
     return this.prisma.participant.update({
       where: {
         tournamentId_userId: {
@@ -49,7 +38,7 @@ export class ParticipantRepository {
           userId
         }
       },
-      data: req
+      data: updateParticipantDto
     });
   }
 
