@@ -56,7 +56,7 @@ model BracketScore {
   roundId      Int
   userIds      Int[]
   scores       Int[]
-  winnerId     Int
+  winnerId     Int?
 
   // Relations
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)

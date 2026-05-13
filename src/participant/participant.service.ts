@@ -11,18 +11,18 @@ export class ParticipantService {
     private readonly tournamentRepository: TournamentRepository
   ) {}
 
-  async participate(tourid: number, createParticipantDto: CreateParticipantDto, userId: number) {
+  async participate(tourid: number, createParticipantDto: CreateParticipantDto, user: any) {
     const tourStatus = await this.tournamentRepository.findOneTourney(tourid);
     if (tourStatus?.status !== 'Upcoming') {
       throw new ConflictException('Unable to join a started tournament');
     }
 
     const participated = await this.participantRepository.getTournamentParticipant(tourid);
-    if (participated.some(p => p.userId === userId)) {
+    if (participated.some(p => p.userId === user.userId)) {
       throw new ConflictException('User already participated in this tournament');
     }
     
-    return await this.participantRepository.participate(tourid, createParticipantDto, userId);
+    return await this.participantRepository.participate(tourid, createParticipantDto, user);
   }
 
   async getParticipatedTournament(userid: number) {

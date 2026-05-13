@@ -1,40 +1,38 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { BracketScoreDto } from "./dto/bracket-score.dto";
+import { CreateBracketScoreDto } from "./dto/create-bracket-score.dto";
+import { UpdateBracketScoreDto } from "./dto/update-bracket-score.dto";
 
 @Injectable()
 export class BracketScoreRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createScore(tournamentId: number, createBracketScoreDto: BracketScoreDto) {
+  async createScore(createBracketScoreDto: CreateBracketScoreDto) {
     return this.prisma.bracketScore.create({
       data: {
         ...createBracketScoreDto,
-        tournamentId,
+        scores: [0, 0],
+        winnerId: null,
       },
     });
   }
 
   async findByTournamentId(tournamentId: number) {
-    return this.prisma.bracketScore.findMany({
+    const results = await this.prisma.bracketScore.findMany({
       where: {
         tournamentId,
       },
     });
+    
+    // Preserve array order by creating new arrays
+    return results.map(item => ({
+      ...item,
+      userIds: [...item.userIds],
+      scores: [...item.scores]
+    }));
   }
 
-  async findByTournamentAndRound(tournamentId: number, roundId: number) {
-    return this.prisma.bracketScore.findUnique({
-      where: {
-        tournamentId_roundId: {
-          tournamentId,
-          roundId,
-        },
-      },
-    });
-  }
-
-  async updateScore(tournamentId: number, updateBracketScoreDto: BracketScoreDto) {
+  async updateScore(tournamentId: number, updateBracketScoreDto: UpdateBracketScoreDto) {
     return this.prisma.bracketScore.update({
       where: {
         tournamentId_roundId: {
@@ -42,7 +40,7 @@ export class BracketScoreRepository {
           roundId: updateBracketScoreDto.roundId,
         },
       },
-      data: updateBracketScoreDto,
+      data: updateBracketScoreDto
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, ParseIntPipe } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
@@ -11,29 +11,44 @@ export class ParticipantController {
   constructor(private readonly participantService: ParticipantService) {}
 
   @Post(':tourid')
-  participate(@Param('tourid') tourid: number, @Body() createParticipantDto: CreateParticipantDto, @Request() req: any) {
-    return this.participantService.participate(tourid, createParticipantDto, req.user.userId);
+  async participate(@Param('tourid', ParseIntPipe) tourid: number, @Body() createParticipantDto: CreateParticipantDto, @Request() req: any) {
+    return {
+      message: 'Participation created successfully',
+      data: await this.participantService.participate(tourid, createParticipantDto, req.user)
+    };
   }
 
   @Get()
-  getParticipatedTournament(@Request() req: any) {
-    return this.participantService.getParticipatedTournament(req.user.userId);
+  async getParticipatedTournament(@Request() req: any) {
+    return {
+      message: 'Participated tournaments retrieved successfully',
+      data: await this.participantService.getParticipatedTournament(req.user.userId)
+    };
   }
 
   @Get(':tourid')
-  getTournamentParticipant(@Param('tourid') tourid: number) {
-    return this.participantService.getTournamentParticipant(tourid);
+  async getTournamentParticipant(@Param('tourid', ParseIntPipe) tourid: number) {
+    return {
+      message: `Tournament ${tourid} participants retrieved successfully`,
+      data: await this.participantService.getTournamentParticipant(tourid)
+    };
   }
 
   @Patch(':tourid')
-  updateParticipation(@Param('tourid') tourid: number, @Body() updateParticipantDto: UpdateParticipantDto, @Request() req: any) {
+  async updateParticipation(@Param('tourid', ParseIntPipe) tourid: number, @Body() updateParticipantDto: UpdateParticipantDto, @Request() req: any) {
     // Only allowed if the tournament has not started yet
-    return this.participantService.updateParticipation(tourid, req.user.userId, updateParticipantDto);
+    return {
+      message: 'Participation updated successfully',
+      data: await this.participantService.updateParticipation(tourid, req.user.userId, updateParticipantDto)
+    };
   }
 
   @Delete(':tourid')
-  cancelParticipation(@Param('tourid') tourid: number, @Request() req: any) {
+  async cancelParticipation(@Param('tourid', ParseIntPipe) tourid: number, @Request() req: any) {
     // Only allowed if the tournament has not started yet
-    return this.participantService.removeParticipation(tourid, req.user.userId);
+    return {
+      message: 'Participation cancelled successfully',
+      data: await this.participantService.removeParticipation(tourid, req.user.userId)
+    };
   }
 }

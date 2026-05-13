@@ -7,31 +7,31 @@ import { PrismaService } from "../prisma.service";
 export class ParticipantRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  participate(tourid: number, createParticipantDto: CreateParticipantDto, userId: number) {
-    return this.prisma.participant.create({
+  async participate(tourid: number, createParticipantDto: CreateParticipantDto, user: any) {
+    return await this.prisma.participant.create({
       data: {
         tournamentId: tourid,
-        userId: userId,
+        userId: user.userId,
         alias: createParticipantDto.alias,
         prefix: createParticipantDto.prefix || null
       }
     });
   }
 
-  getParticipatedTournament(userId: number) {
-    return this.prisma.participant.findMany({
+  async getParticipatedTournament(userId: number) {
+    return await this.prisma.participant.findMany({
       where: { userId }
     });
   }
 
-  getTournamentParticipant(tournamentId: number) {
-    return this.prisma.participant.findMany({
+  async getTournamentParticipant(tournamentId: number) {
+    return await this.prisma.participant.findMany({
       where: { tournamentId }
     });
   }
 
-  updateParticipation(tournamentId: number, userId: number, updateParticipantDto: UpdateParticipantDto) {
-    return this.prisma.participant.update({
+  async updateParticipation(tournamentId: number, userId: number, updateParticipantDto: UpdateParticipantDto) {
+    return await this.prisma.participant.update({
       where: {
         tournamentId_userId: {
           tournamentId,
@@ -42,8 +42,8 @@ export class ParticipantRepository {
     });
   }
 
-  removeParticipation(tournamentId: number, userId: number) {
-    return this.prisma.participant.delete({
+  async removeParticipation(tournamentId: number, userId: number) {
+    return await this.prisma.participant.delete({
       where: {
         tournamentId_userId: {
           tournamentId,
