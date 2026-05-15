@@ -4,8 +4,9 @@ import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
+import { Public } from 'src/auth/decorators/public.decorator';
 
-@Controller('participants')
+@Controller('participant')
 @UseGuards(JwtAuthGuard)
 export class ParticipantController {
   constructor(private readonly participantService: ParticipantService) {}
@@ -26,6 +27,7 @@ export class ParticipantController {
     };
   }
 
+  @Public()
   @Get(':tourid')
   async getTournamentParticipant(@Param('tourid', ParseIntPipe) tourid: number) {
     return {

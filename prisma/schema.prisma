@@ -27,6 +27,7 @@ model Tournament {
   name         String
   startDate    DateTime @default(now())
   endDate      DateTime
+  utc          String @default("+0")
   game         String
   status       String
   owner        Int // User id

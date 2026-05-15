@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Request, ParseIntPipe } from
 import { BracketScoreService } from './bracket-score.service';
 import { CreateBracketScoreDto } from './dto/create-bracket-score.dto';
 import { UpdateBracketScoreDto } from './dto/update-bracket-score.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
-@Controller('bracket-scores')
+@Controller('bracket-score')
 export class BracketScoreController {
   constructor(private readonly bracketScoreService: BracketScoreService) {}
 
@@ -16,6 +17,7 @@ export class BracketScoreController {
     };
   }
 
+  @Public()
   @Get(':tourid')
   async findByTournamentId(@Param('tourid', ParseIntPipe) tourid: number) {
     // Called when fetching all scores for a tournament

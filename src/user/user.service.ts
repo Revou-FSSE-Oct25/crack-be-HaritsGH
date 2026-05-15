@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -15,8 +16,11 @@ export class UserService {
     return await this.userRepository.updateProfile(username, req);
   }
 
-  async changePassword(username: string, newPassword: string) {
-    const hashedPassword = await bcrypt.hash(newPassword, parseInt(process.env.BCRYPT_SALT_ROUNDS as string));
+  async changePassword(username: string, passwords: ChangePasswordDto) {
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      throw new ConflictException('Passwords do not match');
+    }
+    const hashedPassword = await bcrypt.hash(passwords.newPassword, parseInt(process.env.BCRYPT_SALT_ROUNDS as string));
     return this.userRepository.changePassword(username, hashedPassword);
   }
 
@@ -34,5 +38,9 @@ export class UserService {
     const anonHashedPassword = await bcrypt.hash(`user${user.id}deleted`, parseInt(process.env.BCRYPT_SALT_ROUNDS as string));
 
     return this.userRepository.deleteAccount(username, anonUsername, anonEmail, anonHashedPassword);
+  }
+
+  async searchUsers(username: string) {
+    return await this.userRepository.searchUsers(username);
   }
 }

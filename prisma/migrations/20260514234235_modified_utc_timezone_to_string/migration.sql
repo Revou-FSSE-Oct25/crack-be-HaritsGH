@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Tournament" ALTER COLUMN "utc" SET DEFAULT '+0',
+ALTER COLUMN "utc" SET DATA TYPE TEXT;

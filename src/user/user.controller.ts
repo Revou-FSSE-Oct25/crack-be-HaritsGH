@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Request, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Request, Body, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -16,6 +16,15 @@ export class UserController {
     };
   }
 
+  @Get('search')
+  async searchUsers(@Query('username') username: string) {
+    // For searching users
+    return {
+      message: 'Users searched successfully',
+      data: await this.userService.searchUsers(username),
+    };
+  }
+
   @Patch()
   async updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     // For updating user profile using token username
@@ -30,7 +39,7 @@ export class UserController {
     // For changing user password using token username
     return {
       message: 'Password changed successfully',
-      data: await this.userService.changePassword(req.user.username, changePasswordDto.password),
+      data: await this.userService.changePassword(req.user.username, changePasswordDto),
     };
   }
 

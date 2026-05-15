@@ -1,3 +1,7 @@
+import { IsArray, IsString } from "class-validator";
+
 export class UpdateTournamentAdminsDto {
-  admins: number[];
+  @IsArray()
+  @IsString({ each: true })
+  admins: string[];
 }

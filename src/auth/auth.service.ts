@@ -43,7 +43,7 @@ export class AuthService {
 
     await this.authRepository.storeTokens(newUser.username, accessToken, refreshToken)
 
-    return {access_token: accessToken, refresh_token: refreshToken};
+    return {accessToken, refreshToken};
   }
 
   async login(credentials: AccessAuthDto) {
@@ -75,33 +75,23 @@ export class AuthService {
     };
   }
   
-  async refreshToken(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken);
-      
-      if (payload.type !== 'refresh') {
-        throw new UnauthorizedException('Invalid token type');
-      }
-
-      const user = await this.authRepository.findByUsername(payload.username);
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      const newPayload = { username: user.username, userId: user.id };
-      
-      const newAccessToken = this.jwtService.sign({ ...newPayload, type: 'access' }, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
-      const newRefreshToken = this.jwtService.sign({ ...newPayload, type: 'refresh' }, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
-
-      await this.authRepository.storeTokens(user.username, newAccessToken, newRefreshToken);
-
-      return {
-        access_token: newAccessToken,
-        refresh_token: newRefreshToken
-      };
-    } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
+  async refreshToken(user: { username: string; userId: string }) {
+    const foundUser = await this.authRepository.findByUsername(user.username);
+    if (!foundUser) {
+      throw new UnauthorizedException('User not found');
     }
+
+    const newPayload = { username: foundUser.username, userId: foundUser.id };
+    
+    const newAccessToken = this.jwtService.sign({ ...newPayload, type: 'access' }, { expiresIn: (this.configService.get<string>('JWT_ACCESS_EXP')) as any });
+    const newRefreshToken = this.jwtService.sign({ ...newPayload, type: 'refresh' }, { expiresIn: (this.configService.get<string>('JWT_REFRESH_EXP')) as any });
+
+    await this.authRepository.storeTokens(foundUser.username, newAccessToken, newRefreshToken);
+
+    return {
+      accessToken : newAccessToken,
+      refreshToken: newRefreshToken
+    };
   }
 
   async logout(username: string) {

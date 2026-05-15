@@ -2,5 +2,8 @@ import { IsString } from 'class-validator';
 
 export class ChangePasswordDto {
   @IsString()
-  password: string;
+  newPassword: string;
+
+  @IsString()
+  confirmPassword: string;
 }

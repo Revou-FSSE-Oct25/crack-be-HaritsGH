@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AccessAuthDto } from './dto/access-auth.dto';
 import { Public } from './decorators/public.decorator';
-import { access } from 'fs';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,8 +16,8 @@ export class AuthController {
 
     return {
       message: 'User registered successfully',
-      access_token: res.access_token,
-      refresh_token: res.refresh_token
+      accessToken: res.accessToken,
+      refreshToken: res.refreshToken
     };
   }
 
@@ -27,19 +27,20 @@ export class AuthController {
     const res = await this.authService.login(credentials);
     return {
       message: 'User logged in successfully',
-      access_token: res.access_token,
-      refresh_token: res.refresh_token
+      accessToken: res.access_token,
+      refreshToken: res.refresh_token
     };
   }
 
   @Public()
+  @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  async refreshToken(@Body() body: { refresh_token: string }) {
-    const result = await this.authService.refreshToken(body.refresh_token);
+  async refreshToken(@Request() req) {
+    const result = await this.authService.refreshToken(req.user);
     return {
       message: 'Token refreshed successfully',
-      access_token: result.access_token,
-      refresh_token: result.refresh_token
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken
     };
   }
 
@@ -49,5 +50,10 @@ export class AuthController {
     return {
       message: 'User logged out successfully'
     };
+  }
+
+  @Get()
+  async getUser(@Request() req) {
+    return await req.user;
   }
 }

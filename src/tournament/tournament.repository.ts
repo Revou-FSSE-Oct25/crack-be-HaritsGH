@@ -43,6 +43,31 @@ export class TournamentRepository{
     });
   }
 
+  async searchTourney(query: string) {
+    return await this.prisma.tournament.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: 'insensitive'
+        }
+      }
+    });
+  }
+
+  async checkForAdmin(userId: number) {
+    return await this.prisma.tournament.findMany({
+      where: {
+        OR: [
+          { admins: { has: userId } },
+          { owner: userId }
+        ]
+      },
+      select: {
+        id: true
+      }
+    });
+  }
+
   async updateTourney(tourid: number, updateTournamentDto: UpdateTournamentDto) {
     return await this.prisma.tournament.update({
       where: { id: tourid },

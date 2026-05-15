@@ -1,4 +1,11 @@
+import { IsEmail, IsOptional, IsString } from 'class-validator';
+
 export class UpdateUserDto {
-  email: string;
-  profileImageURL: string | null;
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  profileImageURL?: string | null;
 }
