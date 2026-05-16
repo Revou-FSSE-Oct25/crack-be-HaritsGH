@@ -79,8 +79,8 @@ export class TournamentController {
   async updateTourneyAdmins(@Param('tourid', ParseIntPipe) tourid: number, @Body() updateAdminDto: UpdateTournamentAdminsDto, @Request() req: any) {
     // For updating admins of a specific tournament by ID
     return {
-      message: `Tournament with id ${tourid} now has ${updateAdminDto.admins.join(', ')} as admins`,
-      data: await this.tournamentService.updateTourneyAdmins(tourid, updateAdminDto.admins, req.user.username)
+      message: `Tournament with id ${tourid} now has ${updateAdminDto.admins.map(a => a.username).join(', ')} as admins`,
+      data: await this.tournamentService.updateTourneyAdmins(tourid, updateAdminDto, req.user.userId)
     };
   }
 }

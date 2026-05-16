@@ -7,11 +7,6 @@ export class UpdateTournamentDto extends PartialType(CreateTournamentDto) {
   @IsOptional()
   status?: string;
 
-  @IsArray()
-  @IsNumber({}, { each: true })
-  @IsOptional()
-  admins?: number[];
-
   @IsString()
   @IsOptional()
   utc?: string;

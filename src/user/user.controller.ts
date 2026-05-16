@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Request, Body, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Request, Body, Query, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -17,11 +17,20 @@ export class UserController {
   }
 
   @Get('search')
-  async searchUsers(@Query('username') username: string) {
+  async searchUsers(@Query('q') username: string) {
     // For searching users
     return {
       message: 'Users searched successfully',
       data: await this.userService.searchUsers(username),
+    };
+  }
+
+  @Post('usernames')
+  async getUserById(@Body() userIds: number[]) {
+    // For fetching user by ID
+    return {
+      message: 'Users retrieved successfully',
+      data: await this.userService.getUserById(userIds),
     };
   }
 

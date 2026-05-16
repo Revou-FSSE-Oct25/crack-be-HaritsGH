@@ -3,6 +3,7 @@ import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
 import { TournamentRepository } from './tournament.repository';
 import { UserRepository } from '../user/user.repository';
+import { UpdateTournamentAdminsDto } from './dto/update-tournament-admins.dto';
 
 @Injectable()
 export class TournamentService {
@@ -35,12 +36,6 @@ export class TournamentService {
     if (!admins?.admins?.includes(requesterId)) {
       throw new UnauthorizedException('Only admins can update tournament');
     }
-    
-    if (updateTournamentDto.admins) {
-      const existingAdmins = admins?.admins || [];
-      const mergedAdmins = [...new Set([...existingAdmins, ...updateTournamentDto.admins])];
-      updateTournamentDto.admins = mergedAdmins;
-    }
 
     if (updateTournamentDto.startDate && updateTournamentDto.endDate && updateTournamentDto.startDate > updateTournamentDto.endDate) {
       throw new ConflictException('Start date must be before end date');
@@ -57,21 +52,15 @@ export class TournamentService {
     return await this.tournamentRepository.deleteTourney(tourid);
   }
 
-  async updateTourneyAdmins(tourid: number, adminsUsername: string[], requesterId: number) {
+  async updateTourneyAdmins(tourid: number, adminsInfo: UpdateTournamentAdminsDto, requesterId: number) {
     const tournament = await this.tournamentRepository.findOneTourney(tourid);
     if (requesterId !== tournament?.owner) {
       throw new UnauthorizedException('Only owner can update admins');
     }
 
-    const rawAdminsIds = await Promise.all(adminsUsername.map(async (username) => {
-      const profile = await this.userRepository.getProfile(username);
-      return profile?.id;
-    }));
-
-    let adminsIds = rawAdminsIds.filter((id): id is number => id !== undefined);
-
-    if (adminsIds.length === 0) {
-      adminsIds = [requesterId];
+    const adminsIds = adminsInfo.admins.map(admin => admin.id);
+    if (!adminsIds.includes(requesterId)) {
+      adminsIds.push(requesterId);
     }
     return await this.tournamentRepository.updateTourneyAdmins(tourid, adminsIds);
   }

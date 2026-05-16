@@ -43,4 +43,8 @@ export class UserService {
   async searchUsers(username: string) {
     return await this.userRepository.searchUsers(username);
   }
+
+  async getUserById(userIds: number[]) {
+    return await this.userRepository.getUserById(userIds);
+  }
 }

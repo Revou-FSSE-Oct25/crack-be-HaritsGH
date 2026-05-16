@@ -78,6 +78,17 @@ export class UserRepository {
         id: true,
         username: true,
       },
+      take: 10,
+    });
+  }
+
+  async getUserById(userIds: number[]) {
+    return await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        username: true,
+      },
     });
   }
 }
