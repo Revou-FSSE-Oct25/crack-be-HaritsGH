@@ -12,7 +12,7 @@ export class BracketScoreController {
   async createScore(@Body() createBracketScoreDto: CreateBracketScoreDto, @Request() req: any) {
     // Called when the tournament bracked is initialized
     return {
-      message: `Score of match ${createBracketScoreDto.roundId} of Tournament ${createBracketScoreDto.tournamentId} created successfully`,
+      message: `Score of match ${createBracketScoreDto.matchId} of Tournament ${createBracketScoreDto.tournamentId} created successfully`,
       data: await this.bracketScoreService.createScore(createBracketScoreDto, req.user.userId)
     };
   }
@@ -31,7 +31,7 @@ export class BracketScoreController {
   async updateScore(@Param('tourid', ParseIntPipe) tourid: number, @Body() updateBracketScoreDto: UpdateBracketScoreDto, @Request() req: any) {
     // Called when a score is submitted or revising the score for a match
     return {
-      message: `Score of match ${updateBracketScoreDto.roundId} of Tournament ${tourid} updated successfully`,
+      message: `Score of match ${updateBracketScoreDto.matchId} of Tournament ${tourid} updated successfully`,
       data: await this.bracketScoreService.updateScore(tourid,updateBracketScoreDto, req.user.userId)
     };
   }

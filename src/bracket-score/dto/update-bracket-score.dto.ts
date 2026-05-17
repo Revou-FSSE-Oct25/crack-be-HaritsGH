@@ -2,7 +2,7 @@ import { IsArray, IsNumber, IsOptional } from "class-validator";
 
 export class UpdateBracketScoreDto{
   @IsNumber()
-  roundId: number;
+  matchId: number;
 
   @IsArray()
   @IsNumber({}, { each: true })

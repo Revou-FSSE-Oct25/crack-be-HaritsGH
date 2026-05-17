@@ -23,7 +23,7 @@ export class BracketScoreService {
     }
 
     const tournnamentScore = await this.bracketScoreRepository.findByTournamentId(createBracketScoreDto.tournamentId);
-    if (tournnamentScore.some(score => score.roundId === createBracketScoreDto.roundId)) {
+    if (tournnamentScore.some(score => score.matchId === createBracketScoreDto.matchId)) {
       throw new ConflictException('Score already created for this round');
     }
 

@@ -5,5 +5,5 @@ export class CreateBracketScoreDto {
   tournamentId: number;
 
   @IsNumber()
-  roundId: number;
+  matchId: number;
 }

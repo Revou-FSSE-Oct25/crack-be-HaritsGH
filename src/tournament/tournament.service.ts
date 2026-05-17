@@ -8,8 +8,7 @@ import { UpdateTournamentAdminsDto } from './dto/update-tournament-admins.dto';
 @Injectable()
 export class TournamentService {
   constructor(
-    private readonly tournamentRepository: TournamentRepository,
-    private readonly userRepository: UserRepository
+    private readonly tournamentRepository: TournamentRepository
   ) {}
   
   async createTourney(createTournamentDto: CreateTournamentDto, creatorUserId: number) {

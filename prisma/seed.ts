@@ -13,6 +13,7 @@ async function main() {
   // Generate 10 users
   for (let i = 1; i <= 10; i++) {
     const hashedPassword = await bcrypt.hash(process.env.SEED_PASSWORD as string, parseInt(process.env.BCRYPT_SALT_ROUNDS as string))
+
     await prisma.user.create({
       data: {
         username: `user${i}`,
@@ -89,7 +90,7 @@ async function main() {
     await prisma.bracketScore.create({
       data: {
         tournamentId: 2,
-        roundId: i,
+        matchId: i,
         userIds: [],
         scores: [0, 0],
         winnerId: null,
@@ -99,9 +100,9 @@ async function main() {
   // Each round seeding
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 2,
-        roundId: 1,
+        matchId: 1,
       },
     },
     data: {
@@ -112,9 +113,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 2,
-        roundId: 2,
+        matchId: 2,
       },
     },
     data: {
@@ -125,9 +126,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 2,
-        roundId: 3,
+        matchId: 3,
       },
     },
     data: {
@@ -138,9 +139,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 2,
-        roundId: 4,
+        matchId: 4,
       },
     },
     data: {
@@ -151,9 +152,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 2,
-        roundId: 5,
+        matchId: 5,
       },
     },
     data: {
@@ -170,7 +171,7 @@ async function main() {
     await prisma.bracketScore.create({
       data: {
         tournamentId: 3,
-        roundId: i,
+        matchId: i,
         userIds: [],
         scores: [0, 0],
         winnerId: null,
@@ -180,9 +181,9 @@ async function main() {
   // Each round seeding
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 1,
+        matchId: 1,
       },
     },
     data: {
@@ -193,22 +194,22 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 2,
+        matchId: 2,
       },
     },
     data: {
-      userIds: [5, 6],
+      userIds: [2, 5],
       scores: [2, 1],
-      winnerId: 5,
+      winnerId: 2,
     },
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 3,
+        matchId: 3,
       },
     },
     data: {
@@ -219,9 +220,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 4,
+        matchId: 4,
       },
     },
     data: {
@@ -232,9 +233,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 5,
+        matchId: 5,
       },
     },
     data: {
@@ -245,9 +246,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 6,
+        matchId: 6,
       },
     },
     data: {
@@ -258,9 +259,9 @@ async function main() {
   })
   await prisma.bracketScore.update({
     where: {
-      tournamentId_roundId: {
+      tournamentId_matchId: {
         tournamentId: 3,
-        roundId: 7,
+        matchId: 7,
       },
     },
     data: {
@@ -269,7 +270,6 @@ async function main() {
       winnerId: 3,
     },
   })
-  
   console.log('Generated tournament 3 bracket score')
 }
 

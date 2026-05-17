@@ -54,7 +54,7 @@ model Participant {
 
 model BracketScore {
   tournamentId Int
-  roundId      Int
+  matchId      Int
   userIds      Int[]
   scores       Int[]
   winnerId     Int?
@@ -63,5 +63,5 @@ model BracketScore {
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   winner       User?      @relation("BracketScoreWinner", fields: [winnerId], references: [id])
 
-  @@id([tournamentId, roundId])
+  @@id([tournamentId, matchId])
 }

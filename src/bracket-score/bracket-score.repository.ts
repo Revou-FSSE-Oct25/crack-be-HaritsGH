@@ -36,9 +36,9 @@ export class BracketScoreRepository {
   async updateScore(tournamentId: number, updateBracketScoreDto: UpdateBracketScoreDto) {
     return this.prisma.bracketScore.update({
       where: {
-        tournamentId_roundId: {
+        tournamentId_matchId: {
           tournamentId,
-          roundId: updateBracketScoreDto.roundId,
+          matchId: updateBracketScoreDto.matchId,
         },
       },
       data: updateBracketScoreDto

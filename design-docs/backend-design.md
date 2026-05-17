@@ -41,7 +41,7 @@
   
     Columns:
      - TournamentID (FK) {Int}
-     - RoundID {Int}
+     - MatchID {Int}
      - UsersID (FK) {Int[]}
      - Score {Int[]}
      - WinnerID (FK) {Int}
@@ -80,7 +80,7 @@
     Endpoint for querying and managing scores details for each round of a tournament.
      - GET /bracket-scores/:tourid -> For fetching scores of a tournament.
      - POST /bracket-scores -> For creating a record after a score is reported.
-     - PATCH /bracket-scores/:tourid?roundid={roundid} -> For updating a reported score of a tournament.
+     - PATCH /bracket-scores/:tourid?matchid={matchid} -> For updating a reported score of a tournament.
 
 5. /auth
   
