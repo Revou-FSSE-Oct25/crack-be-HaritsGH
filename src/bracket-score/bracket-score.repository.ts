@@ -11,6 +11,7 @@ export class BracketScoreRepository {
     return this.prisma.bracketScore.create({
       data: {
         ...createBracketScoreDto,
+        userIds: [],
         scores: [0, 0],
         winnerId: null,
       },

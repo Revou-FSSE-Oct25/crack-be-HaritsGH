@@ -6,8 +6,4 @@ export class CreateBracketScoreDto {
 
   @IsNumber()
   roundId: number;
-
-  @IsArray()
-  @IsNumber({}, { each: true })
-  userIds: number[];
 }
