@@ -9,21 +9,23 @@ export class BracketScoreController {
   constructor(private readonly bracketScoreService: BracketScoreService) {}
 
   @Post()
-  async createScore(@Body() createBracketScoreDto: CreateBracketScoreDto, @Request() req: any) {
+  async createScore(@Body() body: { participantList: CreateBracketScoreDto | CreateBracketScoreDto[] }, @Request() req: any) {
     // Called when the tournament bracked is initialized
+    const createBracketScoreDto = body.participantList;
+    const tournamentId = Array.isArray(createBracketScoreDto) ? createBracketScoreDto[0]?.tournamentId : createBracketScoreDto.tournamentId;
     return {
-      message: `Score of match ${createBracketScoreDto.matchId} of Tournament ${createBracketScoreDto.tournamentId} created successfully`,
+      message: `Score of Tournament ${tournamentId} initiated successfully`,
       data: await this.bracketScoreService.createScore(createBracketScoreDto, req.user.userId)
     };
   }
 
   @Public()
   @Get(':tourid')
-  async findByTournamentId(@Param('tourid', ParseIntPipe) tourid: number) {
+  async findScoreByTournamentId(@Param('tourid', ParseIntPipe) tourid: number) {
     // Called when fetching all scores for a tournament
     return {
       message: `Scores for tournament ${tourid} retrieved successfully`,
-      data: await this.bracketScoreService.findByTournamentId(tourid)
+      data: await this.bracketScoreService.findScoreByTournamentId(tourid)
     };
   }
 

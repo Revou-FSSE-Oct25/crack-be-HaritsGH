@@ -11,27 +11,42 @@ export class BracketScoreService {
     private readonly tournamentRepository: TournamentRepository,
   ) {}
 
-  async createScore(createBracketScoreDto: CreateBracketScoreDto, requesterId: number) {
-    const tournament = await this.tournamentRepository.findOneTourney(createBracketScoreDto.tournamentId);
+  async createScore(createBracketScoreDto: CreateBracketScoreDto | CreateBracketScoreDto[], requesterId: number) {
+    const results: any[] = [];
+    const dtos = Array.isArray(createBracketScoreDto) ? createBracketScoreDto : [createBracketScoreDto];
 
-    if (!tournament?.admins?.includes(requesterId) || tournament?.owner !== requesterId) {
-      throw new UnauthorizedException('User is not an admin of this tournament');
+    for (const dto of dtos) {
+      if (!dto.tournamentId) {
+        throw new ConflictException('tournamentId is required');
+      }
+
+      const tournament = await this.tournamentRepository.findOneTourney(dto.tournamentId);
+
+      if (!tournament?.admins?.includes(requesterId) || tournament?.owner !== requesterId) {
+        throw new UnauthorizedException('User is not an admin of this tournament');
+      }
+
+      // if (tournament?.status !== 'Ongoing') {
+      //   throw new ConflictException('Unable to submit score for a non-ongoing tournament');
+      // }
+
+      // const tournnamentScore = await this.bracketScoreRepository.findScoreByTournamentId(dto.tournamentId);
+      // if (tournnamentScore.some(score => score.matchId === dto.matchId)) {
+      //   throw new ConflictException('Score already created for this round');
+      // }
+
+      if (!dto.userIds) {
+        dto.userIds = [0, 0];
+      }
+
+      results.push(await this.bracketScoreRepository.createScore(dto));
     }
 
-    if (tournament?.status !== 'Ongoing') {
-      throw new ConflictException('Unable to submit score for a non-ongoing tournament');
-    }
-
-    const tournnamentScore = await this.bracketScoreRepository.findByTournamentId(createBracketScoreDto.tournamentId);
-    if (tournnamentScore.some(score => score.matchId === createBracketScoreDto.matchId)) {
-      throw new ConflictException('Score already created for this round');
-    }
-
-    return this.bracketScoreRepository.createScore(createBracketScoreDto);
+    return results;
   }
 
-  async findByTournamentId(tournamentId: number) {
-    return this.bracketScoreRepository.findByTournamentId(tournamentId);
+  async findScoreByTournamentId(tournamentId: number) {
+    return this.bracketScoreRepository.findScoreByTournamentId(tournamentId);
   }
 
   async updateScore(tourid: number, updateBracketScoreDto: UpdateBracketScoreDto, requesterId: number) {

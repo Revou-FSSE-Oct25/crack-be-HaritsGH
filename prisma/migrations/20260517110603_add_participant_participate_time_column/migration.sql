@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Participant" ADD COLUMN     "participateTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

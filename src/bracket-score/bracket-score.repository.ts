@@ -8,20 +8,29 @@ export class BracketScoreRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createScore(createBracketScoreDto: CreateBracketScoreDto) {
-    return this.prisma.bracketScore.create({
-      data: {
+    return this.prisma.bracketScore.upsert({
+      where: {
+        tournamentId_matchId: {
+          tournamentId: createBracketScoreDto.tournamentId,
+          matchId: createBracketScoreDto.matchId,
+        },
+      },
+      create: {
         ...createBracketScoreDto,
-        userIds: [],
         scores: [0, 0],
         winnerId: null,
       },
+      update: {},
     });
   }
 
-  async findByTournamentId(tournamentId: number) {
+  async findScoreByTournamentId(tournamentId: number) {
     const results = await this.prisma.bracketScore.findMany({
       where: {
         tournamentId,
+      },
+      orderBy: {
+        matchId: 'asc',
       },
     });
     

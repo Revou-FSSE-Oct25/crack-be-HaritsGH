@@ -26,7 +26,10 @@ export class ParticipantRepository {
 
   async getTournamentParticipant(tournamentId: number) {
     return await this.prisma.participant.findMany({
-      where: { tournamentId }
+      where: { tournamentId },
+      orderBy: {
+        participateTime: 'asc'
+      }
     });
   }
 

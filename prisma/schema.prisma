@@ -40,10 +40,11 @@ model Tournament {
 }
 
 model Participant {
-  tournamentId Int
-  userId       Int
-  alias        String
-  prefix       String?
+  tournamentId    Int
+  userId          Int
+  alias           String
+  prefix          String?
+  participateTime DateTime @default(now())
 
   // Relations
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
