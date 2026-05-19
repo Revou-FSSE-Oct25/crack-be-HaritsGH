@@ -11,7 +11,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // Generate 12 users
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 13; i++) {
     const hashedPassword = await bcrypt.hash(process.env.SEED_PASSWORD as string, parseInt(process.env.BCRYPT_SALT_ROUNDS as string))
 
     await prisma.user.upsert({
@@ -23,12 +23,13 @@ async function main() {
         password: hashedPassword,
       },
     })
+    console.log('Created user', i)
   }
-  console.log('Created 12 users')
+  
 
   // Generate 5 tournaments
-  const statuses = ['Upcoming', 'Ongoing', 'Completed', 'Completed', 'Upcoming']
-  for (let i = 1; i <= 5; i++) {
+  const statuses = ['Upcoming', 'Ongoing', 'Completed', 'Completed', 'Upcoming', 'Upcoming', 'Upcoming', 'Upcoming']
+  for (let i = 1; i <= 8; i++) {
     await prisma.tournament.upsert({
       where: { id: i },
       update: {},
@@ -43,8 +44,8 @@ async function main() {
         admins: [1],
       },
     })
+    console.log('Created tournament', i)
   }
-  console.log('Created 5 tournaments')
 
   // Register users 2-4 to tournament 1
   const prefixes = ['Dr', 'Prof', 'Sir']
@@ -154,6 +155,69 @@ async function main() {
     })
   }
   console.log('Registered users 2-10 to tournament 5')
+
+  // Register users 1-10 to tournament 6
+  for (let i = 1; i <= 10; i++) {
+    await prisma.participant.upsert({
+      where: {
+        tournamentId_userId: {
+          tournamentId: 6,
+          userId: i,
+        },
+      },
+      update: {},
+      create: {
+        tournamentId: 6,
+        userId: i,
+        alias: `Fighter ${i}`,
+        prefix: '',
+        participateTime: new Date(Date.now() + (i - 2) * 5 * 60 * 1000), // 5 minutes apart
+      },
+    })
+  }
+  console.log('Registered users 1-10 to tournament 6')
+
+  // Register users 1-11 to tournament 7
+  for (let i = 1; i <= 11; i++) {
+    await prisma.participant.upsert({
+      where: {
+        tournamentId_userId: {
+          tournamentId: 7,
+          userId: i,
+        },
+      },
+      update: {},
+      create: {
+        tournamentId: 7,
+        userId: i,
+        alias: `Fighter ${i}`,
+        prefix: '',
+        participateTime: new Date(Date.now() + (i - 2) * 5 * 60 * 1000), // 5 minutes apart
+      },
+    })
+  }
+  console.log('Registered users 1-11 to tournament 7')
+
+  // Register users 1-12 to tournament 8
+  for (let i = 1; i <= 12; i++) {
+    await prisma.participant.upsert({
+      where: {
+        tournamentId_userId: {
+          tournamentId: 8,
+          userId: i,
+        },
+      },
+      update: {},
+      create: {
+        tournamentId: 8,
+        userId: i,
+        alias: `Fighter ${i}`,
+        prefix: '',
+        participateTime: new Date(Date.now() + (i - 2) * 5 * 60 * 1000), // 5 minutes apart
+      },
+    })
+  }
+  console.log('Registered users 1-12 to tournament 8')
 
   // Generate tournament 2 bracket score
   console.log('Generating tournament 2 bracket score...')
