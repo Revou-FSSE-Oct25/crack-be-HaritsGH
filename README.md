@@ -12,7 +12,7 @@ The backend of [Noartument](https://crack-fe-harits-gh.vercel.app/) used for han
 
 ## Endpoints
 
-Endpoints without * does not need authentication.
+Endpoints with * does not need authentication.
 
 - /auth
   - *POST /auth/register - Register a new user
