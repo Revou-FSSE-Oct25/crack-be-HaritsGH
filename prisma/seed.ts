@@ -10,8 +10,8 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Generate 10 users
-  for (let i = 1; i <= 10; i++) {
+  // Generate 12 users
+  for (let i = 1; i <= 12; i++) {
     const hashedPassword = await bcrypt.hash(process.env.SEED_PASSWORD as string, parseInt(process.env.BCRYPT_SALT_ROUNDS as string))
 
     await prisma.user.upsert({
@@ -24,11 +24,11 @@ async function main() {
       },
     })
   }
-  console.log('Created 10 users')
+  console.log('Created 12 users')
 
-  // Generate 4 tournaments
-  const statuses = ['Upcoming', 'Ongoing', 'Completed', 'Completed']
-  for (let i = 1; i <= 4; i++) {
+  // Generate 5 tournaments
+  const statuses = ['Upcoming', 'Ongoing', 'Completed', 'Completed', 'Upcoming']
+  for (let i = 1; i <= 5; i++) {
     await prisma.tournament.upsert({
       where: { id: i },
       update: {},
@@ -44,7 +44,7 @@ async function main() {
       },
     })
   }
-  console.log('Created 4 tournaments')
+  console.log('Created 5 tournaments')
 
   // Register users 2-4 to tournament 1
   const prefixes = ['Dr', 'Prof', 'Sir']
@@ -132,6 +132,28 @@ async function main() {
     })
   }
   console.log('Registered users 1-5 to tournament 4')
+
+  // Register users 2-10 to tournament 5
+  const prefixes5 = ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr']
+  for (let i = 2; i <= 10; i++) {
+    await prisma.participant.upsert({
+      where: {
+        tournamentId_userId: {
+          tournamentId: 5,
+          userId: i,
+        },
+      },
+      update: {},
+      create: {
+        tournamentId: 5,
+        userId: i,
+        alias: `Fighter ${i}`,
+        prefix: prefixes5[i % 5],
+        participateTime: new Date(Date.now() + (i - 2) * 5 * 60 * 1000), // 5 minutes apart
+      },
+    })
+  }
+  console.log('Registered users 2-10 to tournament 5')
 
   // Generate tournament 2 bracket score
   console.log('Generating tournament 2 bracket score...')
@@ -228,6 +250,19 @@ async function main() {
     },
     data: {
       userIds: [7, 10],
+      // scores: [0, 0],
+      // winnerId: null,
+    },
+  })
+  await prisma.bracketScore.update({
+    where: {
+      tournamentId_matchId: {
+        tournamentId: 2,
+        matchId: 7,
+      },
+    },
+    data: {
+      userIds: [0, 0],
       // scores: [0, 0],
       // winnerId: null,
     },
