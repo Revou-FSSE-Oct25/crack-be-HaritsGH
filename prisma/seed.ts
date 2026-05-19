@@ -262,9 +262,9 @@ async function main() {
       },
     },
     data: {
-      userIds: [0, 0],
-      // scores: [0, 0],
-      // winnerId: null,
+      userIds: [6, 0],
+      scores: [0, 0],
+      winnerId: null,
     },
   })
   console.log('Generated tournament 2 bracket score')
